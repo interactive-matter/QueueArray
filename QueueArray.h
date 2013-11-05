@@ -22,6 +22,9 @@
  *
  *  ---
  *
+ *   2013-11-05 Marcus Nowotny <interactive-matter.eu>
+ *     - rewritten to use a default size
+ *
  *  Version 1.0
  *
  *    2010-09-29  Efstathios Chatzikyriakidis  <contact@efxa.org>
@@ -57,7 +60,7 @@ template<typename T>
 class QueueArray {
   public:
     // init the queue (constructor).
-    QueueArray ();
+    QueueArray (const unsigned char initialSize);
 
     // clear the queue (destructor).
     ~QueueArray ();
@@ -84,17 +87,12 @@ class QueueArray {
     void setPrinter (Print & p);
 
   private:
-    // resize the size of the queue.
-    void resize (const int s);
-
+  
     // exit report method in case of error.
     void exit (const char * m) const;
 
     // led blinking method in case of error.
     void blink () const;
-
-    // the initial size of the queue.
-    static const int initialSize = 2;
 
     // the pin number of the on-board led.
     static const int ledPin = 13;
@@ -111,7 +109,7 @@ class QueueArray {
 
 // init the queue (constructor).
 template<typename T>
-QueueArray<T>::QueueArray () {
+QueueArray<T>::QueueArray (const unsigned char initialSize) {
   size = 0;       // set the size of queue to zero.
   items = 0;      // set the number of items of queue to zero.
 
@@ -146,44 +144,13 @@ QueueArray<T>::~QueueArray () {
   tail = 0;        // set the tail of the queue to zero.
 }
 
-// resize the size of the queue.
-template<typename T>
-void QueueArray<T>::resize (const int s) {
-  // defensive issue.
-  if (s <= 0)
-    exit ("QUEUE: error due to undesirable size for queue size.");
-
-  // allocate enough memory for the temporary array.
-  T * temp = (T *) malloc (sizeof (T) * s);
-
-  // if there is a memory allocation error.
-  if (temp == NULL)
-    exit ("QUEUE: insufficient memory to initialize temporary queue.");
-  
-  // copy the items from the old queue to the new one.
-  for (int i = 0; i < items; i++)
-    temp[i] = contents[(head + i) % size];
-
-  // deallocate the old array of the queue.
-  free (contents);
-
-  // copy the pointer of the new queue.
-  contents = temp;
-
-  // set the head and tail of the new queue.
-  head = 0; tail = items;
-
-  // set the new size of the queue.
-  size = s;
-}
-
 // push an item to the queue.
 template<typename T>
 void QueueArray<T>::push (const T i) {
   // check if the queue is full.
   if (isFull ())
     // double size of array.
-    resize (size * 2);
+    exit("todo");
 
   // store the item to the array.
   contents[tail++] = i;
@@ -211,9 +178,6 @@ T QueueArray<T>::pop () {
   // wrap-around index.
   if (head == size) head = 0;
 
-  // shrink size of array if necessary.
-  if (!isEmpty () && (items <= size / 4))
-    resize (size / 2);
 
   // return the item from the array.
   return item;
