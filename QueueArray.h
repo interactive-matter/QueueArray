@@ -24,6 +24,7 @@
  *
  *   2013-11-05 Marcus Nowotny <interactive-matter.eu>
  *     - rewritten to use a default size
+ *     - texts are now in flash
  *
  *  Version 1.0
  *
@@ -84,12 +85,12 @@ class QueueArray {
     bool isFull () const;
 
     // set the printer of the queue.
-    void setPrinter (Print & p);
+    void setStream (Stream & s);
 
   private:
   
     // exit report method in case of error.
-    void exit (const char * m) const;
+    void exit(const __FlashStringHelper*) const;
 
     // led blinking method in case of error.
     void blink () const;
@@ -97,7 +98,7 @@ class QueueArray {
     // the pin number of the on-board led.
     static const int ledPin = 13;
 
-    Print * printer; // the printer of the queue.
+    Stream * stream; // the printer of the queue.
     T * contents;    // the array of the queue.
 
     int size;        // the size of the queue.
@@ -116,14 +117,14 @@ QueueArray<T>::QueueArray (const unsigned char initialSize) {
   head = 0;       // set the head of the queue to zero.
   tail = 0;       // set the tail of the queue to zero.
 
-  printer = NULL; // set the printer of queue to point nowhere.
+  stream = NULL; // set the printer of queue to point nowhere.
 
   // allocate enough memory for the array.
   contents = (T *) malloc (sizeof (T) * initialSize);
 
   // if there is a memory allocation error.
   if (contents == NULL)
-    exit ("QUEUE: insufficient memory to initialize queue.");
+    exit (F("QUEUE: insufficient memory to initialize queue."));
 
   // set the initial size of the queue.
   size = initialSize;
@@ -135,7 +136,7 @@ QueueArray<T>::~QueueArray () {
   free (contents); // deallocate the array of the queue.
 
   contents = NULL; // set queue's array pointer to nowhere.
-  printer = NULL;  // set the printer of queue to point nowhere.
+  stream = NULL;  // set the printer of queue to point nowhere.
 
   size = 0;        // set the size of queue to zero.
   items = 0;       // set the number of items of queue to zero.
@@ -150,7 +151,7 @@ void QueueArray<T>::push (const T i) {
   // check if the queue is full.
   if (isFull ())
     // double size of array.
-    exit("todo");
+    exit(F("todo"));
 
   // store the item to the array.
   contents[tail++] = i;
@@ -167,7 +168,7 @@ template<typename T>
 T QueueArray<T>::pop () {
   // check if the queue is empty.
   if (isEmpty ())
-    exit ("QUEUE: can't pop item from queue: queue is empty.");
+    exit (F("QUEUE: can't pop item from queue: queue is empty."));
 
   // fetch the item from the array.
   T item = contents[head++];
@@ -178,7 +179,6 @@ T QueueArray<T>::pop () {
   // wrap-around index.
   if (head == size) head = 0;
 
-
   // return the item from the array.
   return item;
 }
@@ -188,7 +188,7 @@ template<typename T>
 T QueueArray<T>::peek () const {
   // check if the queue is empty.
   if (isEmpty ())
-    exit ("QUEUE: can't peek item from queue: queue is empty.");
+    exit (F("QUEUE: can't peek item from queue: queue is empty."));
 
   // get the item from the array.
   return contents[head];
@@ -214,16 +214,16 @@ int QueueArray<T>::count () const {
 
 // set the printer of the queue.
 template<typename T>
-void QueueArray<T>::setPrinter (Print & p) {
-  printer = &p;
+void QueueArray<T>::setStream (Stream & s) {
+  stream = &s;
 }
 
 // exit report method in case of error.
 template<typename T>
-void QueueArray<T>::exit (const char * m) const {
+void QueueArray<T>::exit (const __FlashStringHelper * m) const {
   // print the message if there is a printer.
-  if (printer)
-    printer->println (m);
+  if (stream)
+    stream->println (m);
 
   // loop blinking until hardware reset.
   blink ();
