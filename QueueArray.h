@@ -22,6 +22,9 @@
  *
  *  ---
  *
+ *   2013-11-07 Marcus Nowotny <interactive-matter.eu>
+ *     - pushing to a full array does not crash but returns false
+ * 
  *   2013-11-05 Marcus Nowotny <interactive-matter.eu>
  *     - rewritten to use a default size
  *     - texts are now in flash
@@ -67,7 +70,7 @@ class QueueArray {
     ~QueueArray ();
 
     // push an item to the queue.
-    void push (const T i);
+    bool push (const T i);
 
     // pop an item from the queue.
     T pop ();
@@ -147,11 +150,11 @@ QueueArray<T>::~QueueArray () {
 
 // push an item to the queue.
 template<typename T>
-void QueueArray<T>::push (const T i) {
+bool QueueArray<T>::push (const T i) {
   // check if the queue is full.
   if (isFull ())
-    // double size of array.
-    exit(F("todo"));
+    // we cannot add anythif - just return false
+    return false;
 
   // store the item to the array.
   contents[tail++] = i;
@@ -161,6 +164,9 @@ void QueueArray<T>::push (const T i) {
 
   // increase the items.
   items++;
+
+  //ok everything was fin
+  return true;
 }
 
 // pop an item from the queue.
