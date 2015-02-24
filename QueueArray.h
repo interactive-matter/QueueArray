@@ -64,7 +64,7 @@ template<typename T>
 class QueueArray {
   public:
     // init the queue (constructor).
-    QueueArray (const unsigned char initialSize);
+    QueueArray (const uint16_t initialSize);
 
     // clear the queue (destructor).
     ~QueueArray ();
@@ -82,7 +82,7 @@ class QueueArray {
     bool isEmpty () const;
 
     // get the number of items in the queue.
-    int count () const;
+    uint16_t count () const;
 
     // check if the queue is full.
     bool isFull () const;
@@ -104,16 +104,16 @@ class QueueArray {
     Stream * stream; // the printer of the queue.
     T * contents;    // the array of the queue.
 
-    int size;        // the size of the queue.
-    int items;       // the number of items of the queue.
+    uint16_t size;        // the size of the queue.
+    uint16_t items;       // the number of items of the queue.
 
-    int head;        // the head of the queue.
-    int tail;        // the tail of the queue.
+    uint16_t head;        // the head of the queue.
+    uint16_t tail;        // the tail of the queue.
 };
 
 // init the queue (constructor).
 template<typename T>
-QueueArray<T>::QueueArray (const unsigned char initialSize) {
+QueueArray<T>::QueueArray (const uint16_t initialSize) {
   size = 0;       // set the size of queue to zero.
   items = 0;      // set the number of items of queue to zero.
 
@@ -214,7 +214,7 @@ bool QueueArray<T>::isFull () const {
 
 // get the number of items in the queue.
 template<typename T>
-int QueueArray<T>::count () const {
+uint16_t QueueArray<T>::count () const {
   return items;
 }
 
